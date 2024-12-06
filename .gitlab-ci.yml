@@ -8,7 +8,7 @@ build:
   stage: build
   script:
     - echo "Building the application..."
-    - pip install -r requirements.txt  #if i add hello world
+    - pip install -r requirements.txt  #if i add hello world if you can fight
 
 deploy_ec2:
   stage: deploy_ec2

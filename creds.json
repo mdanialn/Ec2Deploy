@@ -1,7 +1,7 @@
 {
-    "host":"${DB_HOST}ec2deploydb1.cpeq6k0as1ht.us-east-1.rds.amazonaws.com",
+    "host":"${DB_HOST}",
     "dbname":"",
-    "user":"${POSTGRES_USER}postgres",
-    "password":"${POSTGRES_PASSWORD}Hello1234!#$%",
+    "user":"${POSTGRES_USER}",
+    "password":"${POSTGRES_PASSWORD}",
     "port":"5432"
 }

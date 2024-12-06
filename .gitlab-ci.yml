@@ -1,1 +1,49 @@
-#blalkfdlajfs;
+image: python:3.13
+
+stages:
+  - build
+  - deploy_ec2
+  - deploy_lambda
+
+build:
+  stage: build
+  script:
+    - echo "Building the application..."
+    - pip install -r requirements.txt  # Install dependencies
+
+deploy_ec2:
+  stage: deploy_ec2
+  before_script:
+    - mkdir -p ~/.ssh
+    - echo "$AWS_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-keyscan -H $AWS_PUBLIC_IP >> ~/.ssh/known_hosts
+  script:
+    - echo "Deploying application to EC2"
+    - |
+      if ssh -o StrictHostKeyChecking=no $AWS_USERNAME@$AWS_PUBLIC_IP "
+          sudo yum update -y &&
+          sudo yum install postgresql15-server -y &&
+          sudo systemctl enable postgresql && 
+          # Clear the data directory if not empty
+          if [ -d /var/lib/pgsql/data ] && [ \"\$(ls -A /var/lib/pgsql/data)\" ]; then
+              sudo rm -rf /var/lib/pgsql/data/*
+          fi &&
+          sudo postgresql-setup initdb &&
+          sudo systemctl start postgresql &&
+          cd /home/ec2-user/nodeplay &&
+          pwd &&
+          git clone https://github.com/mdanialn/Ec2Deploy.git &&
+          cd Ec2Deploy &&
+          python3 -m venv venv &&
+          source venv/bin/activate &&
+          pip install -r requirements.txt &&
+          nohup gunicorn --bind 0.0.0.0:8000 app:app &"
+      then
+        echo "SSH connection successful. Application deployed successfully on EC2."
+      else
+        echo "SSH connection failed. Deployment to EC2 was unsuccessful." >&2
+        exit 1
+      fi
+  only:
+    - master

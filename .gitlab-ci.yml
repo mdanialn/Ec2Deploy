@@ -3,7 +3,6 @@ image: python:3.13
 stages:
   - build
   - deploy_ec2
-  - deploy_lambda
 
 build:
   stage: build
@@ -39,11 +38,11 @@ deploy_ec2:
           source venv/bin/activate &&
           pip install -r requirements.txt &&
           nohup gunicorn --bind 0.0.0.0:8000 app:app &"
-      then
+      then 
         echo "SSH connection successful. Application deployed successfully on EC2."
       else
         echo "SSH connection failed. Deployment to EC2 was unsuccessful." >&2
         exit 1
       fi
   only:
-    - master
+    - main

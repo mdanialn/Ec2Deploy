@@ -9,3 +9,4 @@ numpy
 dash
 dash-auth
 plotly
+json

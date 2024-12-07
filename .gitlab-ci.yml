@@ -45,7 +45,30 @@ deploy_ec2:
         sudo chown -R ec2-user:ec2-user /home/ec2-user/nodeplay/Ec2Deploy/venv
         pip install --upgrade pip
         pip install -r requirements.txt
-        python app.py
+
+        # Setting up environment variables for database connection
+        echo "Setting up environment variables..."
+        export DB_HOST="$DB_HOST"
+        export DB_USER="$DB_USER"
+        export DB_PASSWORD="$DB_PASSWORD"
+        
+        echo $DB_HOST
+        echo $DB_USER
+        echo $DB_PASSWORD
+
+        echo "Starting the application..."
+        nohup python app.py &
+        APP_PID=$!
+        echo "Application started with PID: $APP_PID"
+
+        # Wait for 5 minutes
+        echo "Application will run for 5 minutes..."
+        sleep 300
+
+        # Terminate the application
+        echo "Terminating the application..."
+        kill $APP_PID || echo "Application already terminated"
+        
       EOF
       # Add a newline character here to properly terminate the here document
   only:

@@ -1,8 +1,7 @@
 Flask==2.3.2            # Web framework for building web applications
 gunicorn==21.2.0        # WSGI HTTP server for UNIX, used to serve Flask applications
 boto3>=1.26.30          # Use a newer version of boto3
-awscli>=1.27.50           # AWS SDK for Python to interact with AWS services
-psycopg2==2.9.10
+awscli>=1.27.50           # AWS SDK for Python to interact with AWS service
 psycopg2-binary==2.9.10  # PostgreSQL adapter for Python
 pytz==2023.3            # Library for working with time zones
 pandas==2.2.3
@@ -10,3 +9,4 @@ numpy==2.1.3
 dash==2.18.2
 dash-auth==2.3.0
 plotly==5.24.1
+pip==24.3.1

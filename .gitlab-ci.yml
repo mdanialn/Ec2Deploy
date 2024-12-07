@@ -8,7 +8,7 @@ build:
   stage: build
   script:
     - echo "Building the application..."
-    - pip install -r requirements.txt  #if i add hello world if you can fight
+    - pip install -r requirements.txt  # Install dependencies
 
 deploy_ec2:
   stage: deploy_ec2
@@ -20,29 +20,33 @@ deploy_ec2:
   script:
     - echo "Deploying application to EC2"
     - |
-      if ssh -o StrictHostKeyChecking=no $AWS_USERNAME@$AWS_PUBLIC_IP "
-          sudo yum update -y &&
-          sudo yum install postgresql15-server -y &&
-          sudo systemctl enable postgresql && 
-          # Clear the data directory if not empty
-          if [ -d /var/lib/pgsql/data ] && [ \"\$(ls -A /var/lib/pgsql/data)\" ]; then
-              sudo rm -rf /var/lib/pgsql/data/*
-          fi &&
-          sudo postgresql-setup initdb &&
-          sudo systemctl start postgresql &&
-          cd /home/ec2-user/nodeplay &&
-          pwd &&
-          git clone https://github.com/mdanialn/Ec2Deploy.git &&
-          cd Ec2Deploy &&
-          python3 -m venv venv &&
-          source venv/bin/activate &&
-          pip install -r requirements.txt &&
-          nohup gunicorn --bind 0.0.0.0:8000 app:app &"
-      then 
-        echo "SSH connection successful. Application deployed successfully on EC2."
-      else
-        echo "SSH connection failed. Deployment to EC2 was unsuccessful." >&2
-        exit 1
-      fi
+      ssh -o StrictHostKeyChecking=no $AWS_USERNAME@$AWS_PUBLIC_IP << 'EOF'
+        set -e
+        sudo yum update -y
+        sudo su
+        cd /var/lib/pgsql/data/
+        sudo rm -rf /var/lib/pgsql/data/*
+        sudo yum install postgresql15-server -y
+        sudo systemctl enable postgresql
+        
+        # Initialize the PostgreSQL database with the correct syntax
+        echo "Initializing PostgreSQL database..."
+        sudo -u postgres postgresql-setup --initdb --unit postgresql
+        sudo systemctl start postgresql
+
+        echo "Cloning application repository..."
+        cd ~ 
+        cd /home/ec2-user/nodeplay
+        sudo yum install git
+        git clone https://github.com/mdanialn/Ec2Deploy.git
+        cd Ec2Deploy
+        python3 -m venv venv
+        source venv/bin/activate
+        sudo chown -R ec2-user:ec2-user /home/ec2-user/nodeplay/Ec2Deploy/venv
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        python app.py
+      EOF
+      # Add a newline character here to properly terminate the here document
   only:
     - main

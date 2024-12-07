@@ -5,7 +5,7 @@ awscli>=1.27.50           # AWS SDK for Python to interact with AWS service
 psycopg2-binary==2.9.10  # PostgreSQL adapter for Python
 pytz==2023.3            # Library for working with time zones
 pandas==2.2.3
-numpy==1.26.0
+numpy==2.0.2
 dash==2.18.2
 dash-auth==2.3.0
 plotly==5.24.1
